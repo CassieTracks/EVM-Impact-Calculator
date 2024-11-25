@@ -67,13 +67,13 @@ InteractiveEVMTool/
 
 3. **Run the application:**
    ```bash
-   python src/main.py
+   streamlit run main.py
    ```
 
 ---
 ### In-code Documentation
 
-The **Interactive EVM Tool** has a modular codebase with well-defined functions to handle data processing, visualization, and user interactions. This section provides an overview of all the functions in the code, categorized by their purpose, along with their descriptions.
+The **Interactive EVM Tool** has a modular codebase with functions to handle data processing, visualization, and user interactions. This section provides an overview of all the functions in the code, categorized by their purpose, along with their descriptions.
 
 ---
 

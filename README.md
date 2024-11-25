@@ -14,6 +14,16 @@ Ensure you have Python installed (recommended: Python 3.8+)
 - kaleido (Note on Windows must use kaleido version 0.1.0post1 for it to work with streamlit)
 
 ### Running the App
+#### Installation
+    use pip to install the required third party packages: pip -r requirements.txt
+
+#### Usage
+ 
+    From a IDE you can just run the relevant .py file. If you don’t have a IDE, open a terminal,cd to the appropriate folder and type in python <.py file>
+
+    main.py: run it in the project root folder, so it can import from the testpack folder
+
+
 Launch the app locally:
     > streamlit run main.py
 or use the following command replacing the folder location to where the repository is stored:

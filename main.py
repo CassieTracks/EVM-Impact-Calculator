@@ -34,19 +34,19 @@ def main():
         show_chart_screen()
 
 def navigate_to_upload_screen_1():
-    """modifies the session state page to the first screen"""
+    '''modifies the session state page to the first screen'''
     st.session_state.page = 'upload_screen_1'
 
 def navigate_to_upload_screen_2():
-    """modifies the session state page to the second screen"""
+    '''modifies the session state page to the second screen'''
     st.session_state.page = 'upload_screen_2'
 
 def navigate_to_chart_screen():
-    """modifies the session state page to the final screen"""
+    '''modifies the session state page to the final screen'''
     st.session_state.page = 'chart_screen'
 
 def show_initial_screen():
-    """Launches the screen to upload the detailed datafile"""
+    '''Launches the screen to upload the detailed datafile'''
     st.title("Interactive EVM Tool")
     st.write("This tool will take a cost profile and item attributes to create an understanding of changes to EVM data")
     st.subheader("Upload Cost Data")
@@ -88,7 +88,7 @@ def show_initial_screen():
             st.error(f"Error: {e}")
 
 def upload_attr_data_page():
-    """Launches a screen to upload the data attributes"""
+    '''Launches a screen to upload the data attributes'''
     st.title("Interactive EVM Tool")
     st.write("This tool will take a cost profile and item attributes to create an understanding of changes to EVM data")
     st.subheader("Upload Attribute Data")
@@ -132,7 +132,7 @@ def upload_attr_data_page():
             st.error(f"Error: {e}")
             
 def show_chart_screen():    
-    """Launches the final screen that includes the charts based on the uploaded data file"""
+    '''Launches the final screen that includes the charts based on the uploaded data file'''
 
     #determines multipliers that defines max value of slider bars
     material_multiplier = 10 
@@ -206,6 +206,8 @@ def show_chart_screen():
                 "item_hours": hours_slider
             }
            
+
+
             #Display charts in tabs 
             tab1, tab2 = st.tabs([
                 "Cummulative Line Chart",
@@ -225,9 +227,11 @@ def show_chart_screen():
                 with placeholder.container():
                     fig2 = generate_charts(st.session_state.cost_df, st.session_state.attribute_df,item_number=selected_item, user_attributes_dictionary=user_attributes_dictionary, chart_type="bubble_chart")
 
+            # Text box to name the PDF file
+            pdf_file_name = st.text_input("Enter a name for the PDF file", value="charts.pdf")
+
 
             # PDF Generation
-            # Single button for export and download
             if st.button("Export and Download PDF", key="export_pdf"):
                 initial_details = f"Initial Attributes: {default_yield*100}% Yield, ${default_cost:,.2f} item cost, {default_lead_time:,.2f} days lead time, {default_hours:,.2f} hours"
                 new_details = f"Modified Attributes: {yield_slider*100}% Yield, ${cost_slider:,.2f} item cost, {lead_time_slider:,.2f} days lead time, {hours_slider:,.2f} hours"
@@ -239,11 +243,10 @@ def show_chart_screen():
                 
                 if pdf_buffer:
                     st.success("PDF generated successfully!")
-                    # Immediately serve the file for download
                     st.download_button(
                         label="Click here to download your PDF",
                         data=pdf_buffer,
-                        file_name="charts.pdf",
+                        file_name=pdf_file_name if pdf_file_name.endswith(".pdf") else f"{pdf_file_name}.pdf",                        
                         mime="application/pdf",
                         key="download_button"
                     )
@@ -257,7 +260,7 @@ def generate_charts(
         chart_type="line_chart",
         item_number=""
         ):
-    """generates a line and bubble line chart"""
+    '''generates a line and bubble line chart'''
 
     #filter the cost_df by the desire item number
     filtered_df = filter_data(cost_df, item_number)
@@ -286,12 +289,12 @@ def generate_charts(
     return fig
 
 def validate_columns_exist(expected_columns, df):
-    """validates that the required columns exist in the uploaded dataframe"""
+    '''validates that the required columns exist in the uploaded dataframe'''
     # Check if all expected columns are present in attributes data
     return all(column in df.columns for column in expected_columns)
         
 def filter_data(df, filter_item_number):
-    """create a copy of the datafile that is filtered to specific item"""
+    '''create a copy of the datafile that is filtered to specific item'''
 
     #create a acopy of the datafile to filter
     filtered_data = df.copy()
@@ -307,7 +310,7 @@ def filter_data(df, filter_item_number):
 
 def assess_impacts(initial_attributes, user_attributes_dictionary):
 
-    """creates a dictionary of the impacts between initial attributes and user changes"""
+    '''creates a dictionary of the impacts between initial attributes and user changes'''
     #item_lead_time changes the date only, change will be expressed in days. This will use averages in the case there are multiple data entries for attributes
     initial_lead_time = initial_attributes['Lead Time'].mean() 
     initial_cost = initial_attributes['Cost'].mean() 
@@ -336,7 +339,7 @@ def assess_impacts(initial_attributes, user_attributes_dictionary):
     return impacts_dictionary
 
 def modify_dataset(filtered_df, impacts_dic):
-    """takes the filtered data and makes a modifed dataframe based on impacts"""
+    '''takes the filtered data and makes a modifed dataframe based on impacts'''
 
     modified_df = filtered_df.copy()
 
@@ -354,7 +357,7 @@ def modify_dataset(filtered_df, impacts_dic):
     return modified_df 
 
 def create_common_x_value_by_month(filtered_df, modified_df):
-    """creates a consistent date field between both datafiles for the x-axis"""
+    '''creates a consistent date field between both datafiles for the x-axis'''
     # Ensure the Date columns are in datetime format
     filtered_df['Date'] = pd.to_datetime(filtered_df['Date'])
     modified_df['Date'] = pd.to_datetime(modified_df['Date'])
@@ -395,7 +398,7 @@ def create_common_x_value_by_month(filtered_df, modified_df):
     return combined_data_set
 
 def calculate_evm(combined_data_set):
-    """Calculates the Earned Value Management metrics for each date"""
+    '''Calculates the Earned Value Management metrics for each date'''
     # Initialize lists to store calculated values
     pv_to_date_list = []
     schedule_percent_complete_list = []
@@ -468,7 +471,7 @@ def calculate_evm(combined_data_set):
     return combined_data_set, evm_summary_data 
 
 def plot_line_chart_with_percent_delta(evm_data, evm_summary_data, data_label_1, data_label_2, chart_title):
-    """creates a line chart with both datasets that displays EVM data"""
+    '''creates a line chart with both datasets that displays EVM data'''
 
     #Data for the chart
     x_values = evm_data["Date"]
@@ -609,7 +612,7 @@ def plot_line_chart_with_percent_delta(evm_data, evm_summary_data, data_label_1,
     return fig
 
 def plot_bubble_chart(data):
-    """create a bubble chart based on both datasets"""
+    '''create a bubble chart based on both datasets'''
 
     df = pd.DataFrame(data)
 
@@ -676,7 +679,7 @@ def export_charts_to_pdf(chart1, chart2, title, settings_text):
 
     # Initialize a PDF canvas
     c = canvas.Canvas(pdf_buffer, pagesize=letter)
-    height = letter
+    height = letter[1]
 
     # Add title to the PDF
     c.setFont("Helvetica-Bold", 16)
@@ -714,4 +717,4 @@ def export_charts_to_pdf(chart1, chart2, title, settings_text):
 # Run the app
 if __name__ == "__main__":
     # Ensure the script runs as a Streamlit app
-    os.system(f"{sys.executable} -m streamlit run {__file__}")
+    main()
