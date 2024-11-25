@@ -88,7 +88,11 @@ def show_initial_screen():
             st.error(f"Error: {e}")
 
 def upload_attr_data_page():
-    '''Launches a screen to upload the data attributes'''
+    '''Launches a screen to upload the data attributes
+
+    Raises:
+        raises error if columns or file type are not correct
+    '''
     st.title("Interactive EVM Tool")
     st.write("This tool will take a cost profile and item attributes to create an understanding of changes to EVM data")
     st.subheader("Upload Attribute Data")
@@ -260,7 +264,20 @@ def generate_charts(
         chart_type="line_chart",
         item_number=""
         ):
-    '''generates a line and bubble line chart'''
+    '''generates a line and bubble line chart
+    
+    Args:
+        cost_df: data file of cost profile from uploaded data
+        attributes_df: data file of attribute data from uploaded data
+        user_attributes_dictionary: dictionary of slider values
+        chart_type: the type of chart to generate (line_chart by default)
+        item_number: the item number that is being plotted from the df's
+
+    Returns: 
+        a figure of the selected chart type  
+    
+    
+    '''
 
     #filter the cost_df by the desire item number
     filtered_df = filter_data(cost_df, item_number)
@@ -280,7 +297,7 @@ def generate_charts(
     
     # Plot the relevant chart based on the chart type
     if chart_type == "line_chart":
-        fig = plot_line_chart_with_percent_delta(combined_data_set_with_evm, evm_summary_data, "Baseline", "Modified", "")
+        fig = plot_line_chart_with_percent_delta(combined_data_set_with_evm, evm_summary_data, "Baseline", "Modified")
         st.plotly_chart(fig, use_container_width=True)
     elif chart_type == "bubble_chart":
         fig = plot_bubble_chart(combined_data_set)
@@ -289,12 +306,27 @@ def generate_charts(
     return fig
 
 def validate_columns_exist(expected_columns, df):
-    '''validates that the required columns exist in the uploaded dataframe'''
+    '''validates that the required columns exist in the uploaded dataframe
+    Args:
+        expected_columns: the columns in the data file that are required
+        df: the datafile to check against expected columns
+    Returns:
+        boolean value based on if the datafile has the expected columns
+    
+    '''
     # Check if all expected columns are present in attributes data
     return all(column in df.columns for column in expected_columns)
         
 def filter_data(df, filter_item_number):
-    '''create a copy of the datafile that is filtered to specific item'''
+    '''create a copy of the datafile that is filtered to specific item
+    Args:
+        df: the data file that is going to be filtered
+        filtered_item_number: the item number to filter the datafile by
+
+    Returns:
+        filtered_data: a filtered dataset    
+    
+    '''
 
     #create a acopy of the datafile to filter
     filtered_data = df.copy()
@@ -310,7 +342,15 @@ def filter_data(df, filter_item_number):
 
 def assess_impacts(initial_attributes, user_attributes_dictionary):
 
-    '''creates a dictionary of the impacts between initial attributes and user changes'''
+    '''creates a dictionary of the impacts between initial attributes and user changes
+    Args:
+        initial_attributes: The list of attributes initially provided 
+        user_attributes_dictionary: The list of attributes modified by the user
+    
+    Returns:
+        impacts_dictionary: a dictionary of the impacts as a result of the initial and modified attributes
+    
+    '''
     #item_lead_time changes the date only, change will be expressed in days. This will use averages in the case there are multiple data entries for attributes
     initial_lead_time = initial_attributes['Lead Time'].mean() 
     initial_cost = initial_attributes['Cost'].mean() 
@@ -339,7 +379,14 @@ def assess_impacts(initial_attributes, user_attributes_dictionary):
     return impacts_dictionary
 
 def modify_dataset(filtered_df, impacts_dic):
-    '''takes the filtered data and makes a modifed dataframe based on impacts'''
+    '''takes the filtered data and makes a modifed dataframe based on impacts
+    Args:
+        filtered_df: A datafile that is filtered to match the modified attributes being evaluated
+        impacts_dic: the impacts as a result of the modified attributes to apply to the datafile
+    Returns:
+        modiefied_df: This is a datafile that is modified based on the modified attributes to be used as a comparison to the original datafile
+
+    '''
 
     modified_df = filtered_df.copy()
 
@@ -357,7 +404,16 @@ def modify_dataset(filtered_df, impacts_dic):
     return modified_df 
 
 def create_common_x_value_by_month(filtered_df, modified_df):
-    '''creates a consistent date field between both datafiles for the x-axis'''
+    '''creates a consistent date field between both datafiles for the x-axis
+    Args:
+        filtered_df: the original filtered datafile before attributes were changed
+        modified_df: the filtered datafile after attributes were changed
+
+    Returns:
+        combined_data_set: single dataset with the before and after and a common x-axis of dates  
+    
+    
+    '''
     # Ensure the Date columns are in datetime format
     filtered_df['Date'] = pd.to_datetime(filtered_df['Date'])
     modified_df['Date'] = pd.to_datetime(modified_df['Date'])
@@ -398,7 +454,16 @@ def create_common_x_value_by_month(filtered_df, modified_df):
     return combined_data_set
 
 def calculate_evm(combined_data_set):
-    '''Calculates the Earned Value Management metrics for each date'''
+    '''Calculates the Earned Value Management metrics for each date
+    Args:
+        Combined_data_set: the combined dataset that will be used for the calculations
+
+    Returns:
+        combined_dataset: the dataset with additional fields added for EVM calculations
+        evm_summary_data: the dataset for the summarized EVM calculations that are not time dependent 
+    
+    
+    '''
     # Initialize lists to store calculated values
     pv_to_date_list = []
     schedule_percent_complete_list = []
@@ -470,8 +535,19 @@ def calculate_evm(combined_data_set):
 
     return combined_data_set, evm_summary_data 
 
-def plot_line_chart_with_percent_delta(evm_data, evm_summary_data, data_label_1, data_label_2, chart_title):
-    '''creates a line chart with both datasets that displays EVM data'''
+def plot_line_chart_with_percent_delta(evm_data, evm_summary_data, data_label_1, data_label_2):
+    '''creates a line chart with both datasets that displays EVM data
+    Args:
+        evm_data: detailed evm data over time
+        evm_summary_data: summarized data not time dependent
+        data_label_1: the name of the first dataset for the legend
+        data_label_2: the name of the second dataset for the legend
+
+    Returns:
+        Figure: a line chart that shows the difference between the two datasets  
+    
+    
+    '''
 
     #Data for the chart
     x_values = evm_data["Date"]
@@ -612,8 +688,13 @@ def plot_line_chart_with_percent_delta(evm_data, evm_summary_data, data_label_1,
     return fig
 
 def plot_bubble_chart(data):
-    '''create a bubble chart based on both datasets'''
+    '''create a bubble chart based on both datasets
+        Args:
+            data: detailed evm data over time
 
+        Returns:
+            Figure: a line chart that shows the difference between the two datasets  
+    '''
     df = pd.DataFrame(data)
 
     # Create the bubble chart
