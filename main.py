@@ -139,8 +139,9 @@ def show_chart_screen():
     '''Launches the final screen that includes the charts based on the uploaded data file'''
 
     #determines multipliers that defines max value of slider bars
-    material_multiplier = 10 
-    leadtime_multiplier = 10 
+    material_multiplier = 10.0
+    leadtime_multiplier = 10.0
+    hours_multiplier = 10.0
 
     st.header("Interactive EVM Tool")
     # Generate PDF and display download button
@@ -178,7 +179,7 @@ def show_chart_screen():
             lead_time_slider = st.sidebar.slider(
                 f"Lead Time (default: ${default_lead_time})", 
                 min_value=0, 
-                max_value=default_lead_time*leadtime_multiplier, 
+                max_value=int(default_lead_time*leadtime_multiplier), 
                 value=int(default_lead_time)
                 )
 
@@ -186,7 +187,7 @@ def show_chart_screen():
 
             # Yield Slider Bar
             yield_slider = st.sidebar.slider(
-                f"Lead Time (default: ${default_yield})", 
+                f"Yield (default: ${default_yield})", 
                 min_value=0.0,
                 max_value=1.0, 
                 value=float(default_yield)
@@ -198,7 +199,7 @@ def show_chart_screen():
             hours_slider = st.sidebar.slider(
                 f"Hours (default: ${default_hours})", 
                 min_value=0.0, 
-                max_value=10.0, 
+                max_value=float(default_hours*hours_multiplier), 
                 value=float(default_hours)
                 )
 
